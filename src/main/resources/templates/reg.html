@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>注册</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="keywords" content="fly,layui,前端社区">
+  <meta name="description" content="Fly社区是模块化前端UI框架Layui的官网社区，致力于为web开发提供强劲动力">
+  <link rel="stylesheet" href="/res/layui/css/layui.css">
+  <link rel="stylesheet" href="/res/css/global.css">
+</head>
+<body>
+
+<div class="fly-header layui-bg-black">
+  <div class="layui-container">
+    <a class="fly-logo" href="#">
+      <img src="/res/images/logo.png" alt="layui" >
+    </a>
+    
+    <ul class="layui-nav fly-nav-user">
+      <!-- 未登入的状态 -->
+      <li class="layui-nav-item">
+        <a class="iconfont icon-touxiang layui-hide-xs" href="user/login.html"></a>
+      </li>
+      <li class="layui-nav-item">
+        <a href="login.html">登入</a>
+      </li>
+      <li class="layui-nav-item">
+        <a href="reg.html">注册</a>
+      </li>
+      <li class="layui-nav-item layui-hide-xs">
+        <a href="/app/qq/" onclick="layer.msg('正在通过QQ登入', {icon:16, shade: 0.1, time:0})" title="QQ登入" class="iconfont icon-qq"></a>
+      </li>
+      <li class="layui-nav-item layui-hide-xs">
+        <a href="/app/weibo/" onclick="layer.msg('正在通过微博登入', {icon:16, shade: 0.1, time:0})" title="微博登入" class="iconfont icon-weibo"></a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="layui-container fly-marginTop">
+  <div class="fly-panel fly-panel-user" pad20>
+    <div class="layui-tab layui-tab-brief" lay-filter="user">
+      <ul class="layui-tab-title">
+        <li><a href="login.html">登入</a></li>
+        <li class="layui-this">注册</li>
+      </ul>
+      <div class="layui-form layui-tab-content" id="LAY_ucm" style="padding: 20px 0;">
+        <div class="layui-tab-item layui-show">
+          <div class="layui-form layui-form-pane">
+            <form method="post">
+              <div class="layui-form-item">
+                <label for="L_email" class="layui-form-label">邮箱</label>
+                <div class="layui-input-inline">
+                  <input type="text" id="user_email" name="user_email" required lay-verify="user_email" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">将会成为您唯一的登入名</div>
+              </div>
+              <div class="layui-form-item">
+                <label for="L_username" class="layui-form-label">昵称</label>
+                <div class="layui-input-inline">
+                  <input type="text" id="L_username" name="L_username" required lay-verify="L_username" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label for="L_pass" class="layui-form-label">密码</label>
+                <div class="layui-input-inline">
+                  <input type="password" id="user_password" name="user_password" required lay-verify="user_password" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">6到16个字符</div>
+              </div>
+              <div class="layui-form-item">
+                <label for="L_repass" class="layui-form-label">确认密码</label>
+                <div class="layui-input-inline">
+                  <input type="password" id="L_repass" name="L_repass" required lay-verify="L_repass" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label for="L_vercode" class="layui-form-label">人类验证</label>
+                <div class="layui-input-inline">
+                  <input type="text" id="user_check" name="user_check" required lay-verify="user_check" placeholder="请回答后面的问题" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid">
+                  <span style="color: #c00;"><img id="regimg" src="/check.jpg" onclick="refresh()"></span>
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <button class="layui-btn" lay-submit="formRemark" lay-filter="formRemark">立即注册</button>
+              </div>
+              
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="fly-footer">
+  <p><a href="http://fly.layui.com/" target="_blank">Fly社区</a> 2017 &copy; <a href="http://www.layui.com/" target="_blank">layui.com 出品</a></p>
+  <p>
+    <a href="http://fly.layui.com/jie/3147/" target="_blank">付费计划</a>
+    <a href="http://www.layui.com/template/fly/" target="_blank">获取Fly社区模版</a>
+    <a href="http://fly.layui.com/jie/2461/" target="_blank">微信公众号</a>
+  </p>
+</div>
+
+<script src="/res/layui/layui.js"></script>
+
+<script>
+function refresh() { 
+    var url = "/check.jpg?number="+Math.random(); 
+    document.getElementById('regimg').src=url;  
+}
+layui.use(['form', 'layedit'], function () {
+  var form = layui.form;
+  var $ = layui.jquery;
+  var layedit = layui.layedit;
+  	
+ 
+  //用户登录前端验证
+  function refresh() { 
+	    var url = "/check.jpg?number="+Math.random(); 
+	    $("#regimg").attr("src",url);  
+  }
+  form.verify({
+      user_email: function (value) {
+          value = $.trim($("#user_email").val());
+          var reg = new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"); //正则表达式
+          if (value == ""){
+              return "邮箱为空";
+          }else if(!reg.test(value)){
+              return "邮箱格式错误！";
+          }
+          
+      },
+      L_username: function (value) {
+          value = $.trim($("#L_username").val());
+          if (value == "") return "昵称为空";
+          
+      },
+      user_password: function (value) {
+          value = $.trim($("#user_password").val());
+          if (value == "") return "密码为空";
+          
+      },
+      L_repass: function (value) {
+          value = $.trim($("#L_repass").val());
+          if (value == ""){
+            return "密码为空";
+          }else if(value != $("#user_password").val()){
+            return "密码不一致";
+          }  
+      },
+      user_check: function (value) {
+          value = $.trim($("#user_check").val());
+          if (value == "") return "验证码为空";
+          
+      }
+  });
+  function submitMessage(message){
+      
+      $.ajax({
+            url: '/toreg',
+            type: 'POST',
+            data: message,
+            //这两个设置项必填
+            contentType: false,
+            processData: false,
+            dataType: 'jsonp',
+            calback: "callback",
+            cache: false,
+            success: function (data) {
+             	 console.log(data);
+	          　　		  if(data['status']=='200'){
+	                    layer.msg("注册成功", {icon: 1,time:1000 });
+	                    
+	                    setTimeout(function () {
+	                    	window.location.href="/login";
+	                    }, 1000);
+	                    var emailData = new FormData();
+	                    emailData.append('email',$("#user_email").val());
+	                    emailData.append('type','reg');
+	                    $.ajax({
+	                        url: '/sendemail',
+	                        type: 'POST',
+	                        data: emailData,
+	                        //这两个设置项必填
+	                        contentType: false,
+	                        processData: false,
+	                        dataType: 'jsonp',
+	                        calback: "callback",
+	                        cache: false,
+	                        success: function (data) {
+	                         	 console.log(data);
+	                        },
+	                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+	                            alert(XMLHttpRequest.status);
+	                        }
+	                  });
+	                    
+	              }else if(data['status']=='101'){
+	                    layer.msg('用户已经存在!',{icon:2,time:1000});
+	                    refresh();
+	                    //console.log(data);
+	              }else{
+	                    layer.msg('注册失败!',{icon:2,time:1000});
+	                    refresh();
+	                    //console.log(data);
+	              }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(XMLHttpRequest.status);
+                alert(XMLHttpRequest.readyState);
+                alert(textStatus);
+            }
+      });
+
+  }
+  //用户注册提交
+  form.on('submit(formRemark)',function (data) {
+      var index = layer.load(1);
+      //模拟评论提交
+      setTimeout(function () {
+          layer.close(index);
+          var content = data.field.editorContent;
+          var formData = new FormData();
+          
+          formData.append('username',$("#user_email").val());
+          formData.append('name',$("#L_username").val());
+          formData.append('password',$("#user_password").val());
+          formData.append('checkcode',$("#user_check").val());
+          submitMessage(formData);
+         
+      }, 500);
+      return false;
+  });
+});
+
+</script>
+
+</body>
+</html>

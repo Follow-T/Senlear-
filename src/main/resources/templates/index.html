@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5" >
+<head th:fragment="senlear_head">
+  <meta charset="utf-8">
+  <title>Seanlear社区</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="keywords" content="fly,layui,前端社区">
+  <meta name="description" content="Fly社区是模块化前端UI框架Layui的官网社区，致力于为web开发提供强劲动力">
+  <link rel="stylesheet" th:href="@{/res/layui/css/layui.css}" >
+  <link rel="stylesheet" th:href="@{/res/css/global.css}" href="/res/css/global.css">
+</head>
+<body>
+
+<div th:replace="~{/user/index::senlear_userTopBar}" class="fly-header layui-bg-black">
+</div>
+
+<div th:fragment="senlear_headnav" class="fly-panel fly-column">
+  <div class="layui-container">
+    <ul class="layui-clear">
+      <li class="layui-hide-xs" id="1"><a style="cursor:pointer" id="index">首页</a></li> 
+      <li id="2"><a style="cursor:pointer" id="question">提问</a></li> 
+      <li id="3"><a style="cursor:pointer" id="share">分享<span class="layui-badge-dot"></span></a></li> 
+      <li id="4"><a style="cursor:pointer" id="advice">建议</a></li> 
+      <li id="5"><a style="cursor:pointer" id="life">记录生活</a></li> 
+      <li id="6"><a style="cursor:pointer" id="resource">资源</a></li> 
+      <li id="7"><a style="cursor:pointer" id="joke" >开心一刻</a></li> 
+      <li id="8"><a style="cursor:pointer" id="science">科技资讯</a></li> 
+      <li id="9"><a style="cursor:pointer" id="other">其他</a></li>
+      <li class="layui-hide-xs layui-hide-sm layui-show-md-inline-block"><span class="fly-mid"></span></li> 
+      
+      <!-- 用户登入后显示 -->
+      <li sec:authorize="isAuthenticated()" class="layui-hide-xs layui-hide-sm layui-show-md-inline-block"><a th:href="${#authentication.principal.username} + '/index#index'" >我发表的贴</a></li>
+      <li sec:authorize="isAuthenticated()" class="layui-hide-xs layui-hide-sm layui-show-md-inline-block"><a th:href="${#authentication.principal.username} + '/index#collection'">我收藏的贴</a></li>
+    </ul> 
+    
+    <div sec:authorize="isAuthenticated()" class="fly-column-right layui-hide-xs">
+      <span class="fly-search"><i class="layui-icon"></i></span> 
+      <a href="jie/add.html" class="layui-btn">发表新帖</a> 
+    </div> 
+    <div sec:authorize="isAuthenticated()" class="layui-hide-sm layui-show-xs-block" style="margin-top: -10px; padding-bottom: 10px; text-align: center;">
+      <a href="jie/add.html" class="layui-btn">发表新帖</a> 
+    </div> 
+  </div>
+</div>
+
+<div class="layui-container">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md8">
+      <div class="fly-panel">
+        <div class="fly-panel-title fly-filter">
+          <a>置顶</a>
+          <a href="#signin" class="layui-hide-sm layui-show-xs-block fly-right" id="LAY_goSignin" style="color: #FF5722;">去签到</a>
+        </div>
+        
+        <ul class="fly-list" >
+        	<li th:each="article : ${topArticleList}">
+            <a th:href="'/'+${article.getUser().username} + '/home'" class="fly-avatar">
+              <img th:src="${article.getUser().avatar} == null ? 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg' : ${article.getUser().avatar}" alt="Tg">
+            </a>
+            <h2>
+              <a th:if="${article.type==1}" class="layui-badge">提问</a>
+              <a th:if="${article.type==2}" class="layui-badge">分享</a>
+              <a th:if="${article.type==3}" class="layui-badge">建议</a>
+              <a th:if="${article.type==4}" class="layui-badge">记录生活</a>
+              <a th:if="${article.type==5}" class="layui-badge">资源</a>
+              <a th:if="${article.type==6}" class="layui-badge">开心一刻</a>
+              <a th:if="${article.type==7}" class="layui-badge">科技资讯</a>
+              <a th:if="${article.type==8}" class="layui-badge">其他</a>
+              <a th:href="'/'+${article.getUser().username} + '/article/'+ ${article.id}"  th:title="${article.title}" th:text="${article.title}"></a>
+            </h2>
+            <div class="fly-list-info">
+              <a th:href="'/'+${article.getUser().username} + '/home'" link>
+                <cite th:text="${article.getUser().name}" >贤心</cite>
+                <i class="iconfont icon-renzheng" title="认证信息：XXX"></i>
+                <i class="layui-badge fly-badge-vip">VIP3</i>
+              </a>
+              <span th:text="${article.createTime}"></span>
+              <span class="layui-badge fly-badge-accept layui-hide-xs">已结</span>
+              <span class="fly-list-nums"> 
+                <i class="iconfont icon-pinglun1" title="回答" ></i>[[${article.commentsize}]]
+              </span>
+            </div>
+            <div class="fly-list-badge">
+              <!--
+              <span class="layui-badge layui-bg-black">置顶</span>
+              <span class="layui-badge layui-bg-red">精帖</span>
+              -->
+            </div>
+          </li>
+        </ul>
+        
+      </div>
+
+      <div class="fly-panel" style="margin-bottom: 0;">
+        
+        <div class="fly-panel-title fly-filter">
+          <a  class="layui-this" id="classfiy" type="0">综合</a>
+          <span class="fly-filter-right layui-hide-xs">
+            <a  style="cursor:pointer"  class="layui-this"  id="newest" >按最新</a>
+            <span class="fly-mid"></span>
+            <a style="cursor:pointer" id="hostest" >按热议</a>
+          </span>
+        </div>
+		
+		<!-- Model加载一部分 -->
+        <ul class="fly-list" id="fly-list-article" style="display: none;">          
+         	<li th:each="article : ${articleslist}">
+            <a th:href="'/'+${article.getUser().username} + '/home'" class="fly-avatar">
+              <img th:src="${article.getUser().avatar} == null ? 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg' : ${article.getUser().avatar}" alt="Tg">
+            </a>
+            <h2>
+              <a th:if="${article.type==1}" class="layui-badge">提问</a>
+              <a th:if="${article.type==2}" class="layui-badge">分享</a>
+              <a th:if="${article.type==3}" class="layui-badge">建议</a>
+              <a th:if="${article.type==4}" class="layui-badge">记录生活</a>
+              <a th:if="${article.type==5}" class="layui-badge">资源</a>
+              <a th:if="${article.type==6}" class="layui-badge">开心一刻</a>
+              <a th:if="${article.type==7}" class="layui-badge">科技资讯</a>
+              <a th:if="${article.type==8}" class="layui-badge">其他</a>
+              <a th:href="'/'+${article.getUser().username} + '/article/'+ ${article.id}"  th:title="${article.title}" th:text="${article.title}"></a>
+            </h2>
+            <div class="fly-list-info">
+              <a th:href="'/'+${article.getUser().username} + '/home'" link>
+                <cite th:text="${article.getUser().name}" >贤心</cite>
+                <!--
+                <i class="iconfont icon-renzheng" title="认证信息：XXX"></i>
+                <i class="layui-badge fly-badge-vip">VIP3</i>
+                -->
+              </a>
+              <span th:text="${article.createTime}"></span>
+              <span class="layui-badge fly-badge-accept layui-hide-xs">已结</span>
+              <span class="fly-list-nums"> 
+                <i class="iconfont icon-pinglun1" title="回答" ></i>[[${article.commentsize}]]
+              </span>
+            </div>
+            <div class="fly-list-badge">
+              <!--<span class="layui-badge layui-bg-red">精帖</span>-->
+            </div>
+          </li>
+        </ul>
+        <ul class="fly-list" id="fly-list-question" style="display: none;">          
+         	<li th:each="article : ${question}">
+            <a th:href="'/'+${article.getUser().username} + '/home'" class="fly-avatar">
+              <img th:src="${article.getUser().avatar} == null ? 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg' : ${article.getUser().avatar}" alt="Tg">
+            </a>
+            <h2>
+              <a class="layui-badge">提问</a>
+              <a th:href="'/'+${article.getUser().username} + '/article/'+ ${article.id}"  th:title="${article.title}" th:text="${article.title}"></a>
+            </h2>
+            <div class="fly-list-info">
+              <a th:href="'/'+${article.getUser().username} + '/home'" link>
+                <cite th:text="${article.getUser().name}" >贤心</cite>
+                <!--
+                <i class="iconfont icon-renzheng" title="认证信息：XXX"></i>
+                <i class="layui-badge fly-badge-vip">VIP3</i>
+                -->
+              </a>
+              <span th:text="${article.createTime}"></span>
+              <span class="layui-badge fly-badge-accept layui-hide-xs">已结</span>
+              <span class="fly-list-nums"> 
+                <i class="iconfont icon-pinglun1" title="回答" ></i>[[${article.commentsize}]]
+              </span>
+            </div>
+            <div class="fly-list-badge">
+              <!--<span class="layui-badge layui-bg-red">精帖</span>-->
+            </div>
+          </li>
+        </ul>
+        <ul class="fly-list" id="fly-list-share" style="display: none;">          
+         	<li th:each="article : ${share}">
+            <a th:href="'/'+${article.getUser().username} + '/home'" class="fly-avatar">
+              <img th:src="${article.getUser().avatar} == null ? 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg' : ${article.getUser().avatar}" alt="Tg">
+            </a>
+            <h2>
+              <a class="layui-badge">分享</a>
+              <a th:href="'/'+${article.getUser().username} + '/article/'+ ${article.id}"  th:title="${article.title}" th:text="${article.title}"></a>
+            </h2>
+            <div class="fly-list-info">
+              <a th:href="'/'+${article.getUser().username} + '/home'" link>
+                <cite th:text="${article.getUser().name}" >贤心</cite>
+                <!--
+                <i class="iconfont icon-renzheng" title="认证信息：XXX"></i>
+                <i class="layui-badge fly-badge-vip">VIP3</i>
+                -->
+              </a>
+              <span th:text="${article.createTime}"></span>
+              <span class="layui-badge fly-badge-accept layui-hide-xs">已结</span>
+              <span class="fly-list-nums"> 
+                <i class="iconfont icon-pinglun1" title="回答" ></i>[[${article.commentsize}]]
+              </span>
+            </div>
+            <div class="fly-list-badge">
+              <!--<span class="layui-badge layui-bg-red">精帖</span>-->
+            </div>
+          </li>
+        </ul>
+        <ul class="fly-list" id="fly-list-advice" style="display: none;">          
+         	<li th:each="article : ${advice}">
+            <a th:href="'/'+${article.getUser().username} + '/home'" class="fly-avatar">
+              <img th:src="${article.getUser().avatar} == null ? 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg' : ${article.getUser().avatar}" alt="Tg">
+            </a>
+            <h2>
+              <a class="layui-badge">建议</a>
+              <a th:href="'/'+${article.getUser().username} + '/article/'+ ${article.id}"  th:title="${article.title}" th:text="${article.title}"></a>
+            </h2>
+            <div class="fly-list-info">
+              <a th:href="'/'+${article.getUser().username} + '/home'" link>
+                <cite th:text="${article.getUser().name}" >贤心</cite>
+                <!--
+                <i class="iconfont icon-renzheng" title="认证信息：XXX"></i>
+                <i class="layui-badge fly-badge-vip">VIP3</i>
+                -->
+              </a>
+              <span th:text="${article.createTime}"></span>
+              <span class="layui-badge fly-badge-accept layui-hide-xs">已结</span>
+              <span class="fly-list-nums"> 
+                <i class="iconfont icon-pinglun1" title="回答" ></i>[[${article.commentsize}]]
+              </span>
+            </div>
+            <div class="fly-list-badge">
+              <!--<span class="layui-badge layui-bg-red">精帖</span>-->
+            </div>
+          </li>
+        </ul>
+        <ul class="fly-list" id="fly-list-life" style="display: none;">          
+         	<li th:each="article : ${life}">
+            <a th:href="'/'+${article.getUser().username} + '/home'" class="fly-avatar">
+              <img th:src="${article.getUser().avatar} == null ? 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg' : ${article.getUser().avatar}" alt="Tg">
+            </a>
+            <h2>
+              <a class="layui-badge">记录生活</a>
+              <a th:href="'/'+${article.getUser().username} + '/article/'+ ${article.id}"  th:title="${article.title}" th:text="${article.title}"></a>
+            </h2>
+            <div class="fly-list-info">
+              <a th:href="'/'+${article.getUser().username} + '/home'" link>
+                <cite th:text="${article.getUser().name}" >贤心</cite>
+                <!--
+                <i class="iconfont icon-renzheng" title="认证信息：XXX"></i>
+                <i class="layui-badge fly-badge-vip">VIP3</i>
+                -->
+              </a>
+              <span th:text="${article.createTime}"></span>
+              <span class="layui-badge fly-badge-accept layui-hide-xs">已结</span>
+              <span class="fly-list-nums"> 
+                <i class="iconfont icon-pinglun1" title="回答" ></i>[[${article.commentsize}]]
+              </span>
+            </div>
+            <div class="fly-list-badge">
+              <!--<span class="layui-badge layui-bg-red">精帖</span>-->
+            </div>
+          </li>
+        </ul>
+        <ul class="fly-list" id="fly-list-resource" style="display: none;">          
+         	<li th:each="article : ${resource}">
+            <a th:href="'/'+${article.getUser().username} + '/home'" class="fly-avatar">
+              <img th:src="${article.getUser().avatar} == null ? 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg' : ${article.getUser().avatar}" alt="Tg">
+            </a>
+            <h2>
+              <a class="layui-badge">资源分享</a>
+              <a th:href="'/'+${article.getUser().username} + '/article/'+ ${article.id}"  th:title="${article.title}" th:text="${article.title}"></a>
+            </h2>
+            <div class="fly-list-info">
+              <a th:href="'/'+${article.getUser().username} + '/home'" link>
+                <cite th:text="${article.getUser().name}" >贤心</cite>
+                <!--
+                <i class="iconfont icon-renzheng" title="认证信息：XXX"></i>
+                <i class="layui-badge fly-badge-vip">VIP3</i>
+                -->
+              </a>
+              <span th:text="${article.createTime}"></span>
+              <span class="layui-badge fly-badge-accept layui-hide-xs">已结</span>
+              <span class="fly-list-nums"> 
+                <i class="iconfont icon-pinglun1" title="回答" ></i>[[${article.commentsize}]]
+              </span>
+            </div>
+            <div class="fly-list-badge">
+              <!--<span class="layui-badge layui-bg-red">精帖</span>-->
+            </div>
+          </li>
+        </ul>
+        <ul class="fly-list" id="fly-list-joke" style="display: none;">          
+         	<li th:each="article : ${joke}">
+            <a th:href="'/'+${article.getUser().username} + '/home'" class="fly-avatar">
+              <img th:src="${article.getUser().avatar} == null ? 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg' : ${article.getUser().avatar}" alt="Tg">
+            </a>
+            <h2>
+              <a class="layui-badge">开心一刻</a>
+              <a th:href="'/'+${article.getUser().username} + '/article/'+ ${article.id}"  th:title="${article.title}" th:text="${article.title}"></a>
+            </h2>
+            <div class="fly-list-info">
+              <a th:href="'/'+${article.getUser().username} + '/home'" link>
+                <cite th:text="${article.getUser().name}" >贤心</cite>
+                <!--
+                <i class="iconfont icon-renzheng" title="认证信息：XXX"></i>
+                <i class="layui-badge fly-badge-vip">VIP3</i>
+                -->
+              </a>
+              <span th:text="${article.createTime}"></span>
+              <span class="layui-badge fly-badge-accept layui-hide-xs">已结</span>
+              <span class="fly-list-nums"> 
+                <i class="iconfont icon-pinglun1" title="回答" ></i>[[${article.commentsize}]]
+              </span>
+            </div>
+            <div class="fly-list-badge">
+              <!--<span class="layui-badge layui-bg-red">精帖</span>-->
+            </div>
+          </li>
+        </ul>
+        <ul class="fly-list" id="fly-list-science" style="display: none;">          
+         	<li th:each="article : ${science_reading}">
+            <a th:href="'/'+${article.getUser().username} + '/home'" class="fly-avatar">
+              <img th:src="${article.getUser().avatar} == null ? 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg' : ${article.getUser().avatar}" alt="Tg">
+            </a>
+            <h2>
+              <a class="layui-badge">科技资讯</a>
+              <a th:href="'/'+${article.getUser().username} + '/article/'+ ${article.id}"  th:title="${article.title}" th:text="${article.title}"></a>
+            </h2>
+            <div class="fly-list-info">
+              <a th:href="'/'+${article.getUser().username} + '/home'" link>
+                <cite th:text="${article.getUser().name}" >贤心</cite>
+                <!--
+                <i class="iconfont icon-renzheng" title="认证信息：XXX"></i>
+                <i class="layui-badge fly-badge-vip">VIP3</i>
+                -->
+              </a>
+              <span th:text="${article.createTime}"></span>
+              <span class="layui-badge fly-badge-accept layui-hide-xs">已结</span>
+              <span class="fly-list-nums"> 
+                <i class="iconfont icon-pinglun1" title="回答" ></i>[[${article.commentsize}]]
+              </span>
+            </div>
+            <div class="fly-list-badge">
+              <!--<span class="layui-badge layui-bg-red">精帖</span>-->
+            </div>
+          </li>
+        </ul>
+        <ul class="fly-list" id="fly-list-other" style="display: none;">          
+         	<li th:each="article : ${other}">
+            <a th:href="'/'+${article.getUser().username} + '/home'" class="fly-avatar">
+              <img th:src="${article.getUser().avatar} == null ? 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg' : ${article.getUser().avatar}" alt="Tg">
+            </a>
+            <h2>
+              <a class="layui-badge">其他</a>
+              <a th:href="'/'+${article.getUser().username} + '/article/'+ ${article.id}"  th:title="${article.title}" th:text="${article.title}"></a>
+            </h2>
+            <div class="fly-list-info">
+              <a th:href="'/'+${article.getUser().username} + '/home'" link>
+                <cite th:text="${article.getUser().name}" >贤心</cite>
+                <!--
+                <i class="iconfont icon-renzheng" title="认证信息：XXX"></i>
+                <i class="layui-badge fly-badge-vip">VIP3</i>
+                -->
+              </a>
+              <span th:text="${article.createTime}"></span>
+              <span class="layui-badge fly-badge-accept layui-hide-xs">已结</span>
+              <span class="fly-list-nums"> 
+                <i class="iconfont icon-pinglun1" title="回答" ></i>[[${article.commentsize}]]
+              </span>
+            </div>
+            <div class="fly-list-badge">
+              <!--<span class="layui-badge layui-bg-red">精帖</span>-->
+            </div>
+          </li>
+        </ul>
+        <ul class="fly-list" id="fly-list-sort"  style="display: none;"> 
+        </ul>
+        <ul class="fly-list" id="fly-list-page"  style="display: none;"> 
+        </ul>
+
+      </div>
+      <div class="fly-signin-main" id="page" sort="1">
+      <button class="layui-btn layui-btn-radius" id="LastPage">上一页</button>
+      <button class="layui-btn layui-btn-radius" id="NextPage">下一页</button>
+      </div>
+    </div>
+    <div class="layui-col-md4">
+
+      <div class="fly-panel">
+        <h3 class="fly-panel-title">温馨通道</h3>
+        <ul class="fly-panel-main fly-list-static">
+          <li>
+            <a href="http://fly.layui.com/jie/4281/" target="_blank">往期开心一刻</a>
+          </li>
+          <li>
+            <a href="http://fly.layui.com/jie/5366/" target="_blank">
+              往期科技资讯
+            </a>
+          </li>
+          <li>
+            <a href="http://fly.layui.com/jie/4281/" target="_blank">该项目 的 GitHub 及 Gitee (码云) 仓库，欢迎Star</a>
+          </li>
+          <li>
+            <a href="http://fly.layui.com/jie/5366/" target="_blank">
+              作者想说的话
+            </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="fly-panel fly-signin">
+        <div class="fly-panel-title">
+          <a id="l" style="cursor:pointer; color:rgb(95, 184, 120);" class="fly-link" >天气</a>
+          <i  class="fly-mid"></i> 
+          <a  id="w" style="cursor:pointer;" class="fly-link" >今日适宜</a>
+          <i  class="fly-mid"></i> 
+          <a id="t" style="cursor:pointer;" class="fly-link" >送给你的话<span class="layui-badge-dot"></span></a>
+          
+        </div>
+        <div class="fly-panel-main" id="wea">
+          <cite id="city"  color="rgb(1, 170, 237)"></cite><br><br>
+          <cite id="date" ></cite><br><br>
+          <cite id="weather" ></cite><br><br>
+          <cite id="tem" ></cite><br>
+        </div>
+        <div class="fly-panel-main fly-signin-main"  id="fit" style="display:none">
+          <cite id="content1"  ></cite>  
+        </div>
+        <div class="fly-panel-main fly-signin-main"  id="word" style="display:none">
+          <cite id="content2"  ></cite>  
+        </div>
+      </div>
+
+      <div class="fly-panel fly-rank fly-rank-reply" id="LAY_replyRank">
+        <h3 class="fly-panel-title">热门用户</h3>
+        <dl>
+          <!--<i class="layui-icon fly-loading">&#xe63d;</i>-->
+          <dd th:each="user : ${userHost}">
+            <a href="user/home.html" th:href="'/'+${user.username} + '/home'">
+              <img th:src="${user.avatar} == null ? 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg' : ${user.avatar}" alt="Tg"><cite th:text="${user.name}"></cite><i>浏览量[[${user.scan}]]</i>
+            </a>
+          </dd>
+         
+        </dl>
+      </div>
+
+      <dl class="fly-panel fly-list-one"  >
+        <dt class="fly-panel-title">本周热议</dt>
+        
+        <dd th:each="article : ${articleHost}" >
+          <a th:href="'/'+${article.getUser().username} + '/article/'+ ${article.id}"  th:title="${article.title}" th:text="${article.title}">基于 layui 的极简社区页面模版</a>
+          <span ><i class="iconfont icon-pinglun1"></i> [[${article.commentsize}]]</span>
+        </dd>
+      </dl>
+
+      <div class="fly-panel" th:fragment="senlear_echo">
+        <div class="fly-panel-title">
+          三毛与荷西
+        </div>
+        <div class="fly-panel-main" style="background-color: #5FB878;">
+          <a     style="background-color: #5FB878;color: #fff">
+          	荷西问三毛:你以后想嫁一个什么样的人?
+          </a><br><br>
+          <a     style="background-color: #5FB878; color: #fff">
+          	三毛说:看不顺眼的,千万富翁也不嫁，看得顺眼的呐,亿万富翁也嫁.
+          </a><br><br>
+          <a     style="background-color: #5FB878; color: #fff">
+          	荷西又说:说到底还是要嫁一个有钱人咯.
+          </a><br><br>
+          <a     style="background-color: #5FB878; color: #fff">
+          	三毛笑着回答说:那可不一定哦.
+          </a><br><br>
+          <a     style="background-color: #5FB878; color: #fff">
+          	荷西说:那要是我呢?
+          </a><br><br>
+          <a     style="background-color: #5FB878; color: #fff">
+          	三毛笑着说:如果是你的话,有饭吃就好了.
+          </a><br><br>
+          <a     style="background-color: #5FB878; color: #fff">
+          	荷西说道:你吃的多吗?
+          </a><br><br>
+          <a     style="background-color: #5FB878; color: #fff">
+          	荷西回答说:傻子,我吃的不多,以后还可以更少点.
+          </a><br>
+        </div>
+      </div>
+      
+      <div class="fly-panel fly-link">
+        <h3 class="fly-panel-title">友情链接</h3>
+        <dl class="fly-panel-main">
+          <dd><a href="http://www.layui.com/" target="_blank">layui</a><dd>
+          <dd><a href="https://spring.io/projects/spring-boot/" target="_blank">Spring Boot</a><dd>
+          <dd><a href="" target="_blank">我的主页</a><dd>
+          <dd><a href="" target="_blank">给未来的你</a><dd>
+        </dl>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div th:fragment="senlear_footer"class="fly-footer">
+  <p><a href="/index" target="_blank">Senlear社区</a> 2019 &copy; <a href="#" target="_blank">Lyz 出品</a></p>
+  <p>
+    <a href="/res/weixin.png" target="_blank">付费计划</a>
+    <a href="" target="_blank">spring boot+layui</a>
+    <a href="/res/me.png" target="_blank">微信号</a>
+  </p>
+</div>
+ 
+<script th:src="@{/res/layui/layui.js}"src="/res/layui/layui.js"></script>
+<script th:src="@{/res/js/index.js}"src="/res/js/index.js"> </script>
+<script src="http://pv.sohu.com/cityjson?ie=utf-8"></script>
+
+</body>
+</html>

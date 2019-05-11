@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}">...</div>
+
+
+<div th:if="${message}">
+    <h2 th:text="${message}"/>
+</div>
+
+<div>
+    <form method="POST" enctype="multipart/form-data" action="/">
+        <table>
+            <tr><td>File to upload:</td><td><input type="file" name="file" /></td></tr>
+            <tr><td></td><td><input type="submit" value="Upload" /></td></tr>
+        </table>
+
+    </form>
+</div>
+
+<div>
+    <table border="1">
+    <thead>
+    <tr>
+
+        <td>Name</td>
+        <td>ID</td>
+        <td>contentType</td>
+        <td>size</td>
+        <td>uploadDate</td>
+        <td>md5</td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${files.size()} eq 0">
+        <td colspan="3">没有文件信息！！</td>
+    </tr>
+    <tr th:each="file : ${files}">
+        <td><a th:href="'files/'+${file.id}" th:text="${file.name}" /></td>
+        <td th:text="${file.id}" ></td>
+        <td th:text="${file.contentType}" ></td>
+        <td th:text="${file.size}" ></td>
+        <td th:text="${file.uploadDate}" ></td>
+        <td th:text="${file.md5}" ></td>
+    </tr>
+    </tbody>
+</table>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}">...</div>
+</body>
+</html>
+
+
+
+----------------------------------------------------
+<tr th:each="article : ${articles}">
+    <td>贤心</td>
+    <td>2016-11-29</td>
+    <td>人生就像是一场修行</td>
+    <td>人生就像是一场修行</td>
+    <td>23</td>
+    <td><span class="layui-btn layui-btn-xs layui-bg-green">已发布</span></td>
+    <td>
+        <a onclick="UnPublishArticle(this)" title="下架">
+            <i class="layui-icon">&#xe601;</i>
+        </a>
+        <a onclick="EditArticle()" title="编辑">
+            <i class="layui-icon">&#xe642;</i>
+        </a>
+        <a onclick="DeleteArticle(this)" title="删除">
+            <i class="layui-icon">&#xe640;</i>
+        </a>
+    </td>
+</tr>
+<tr>
+    <td>许闲心</td>
+    <td>2016-11-28</td>
+    <td>于千万人之中遇见你</td>
+    <td>人生就像是一场修行</td>
+    <td>43</td>
+    <td><span class="layui-btn layui-btn-xs layui-bg-gray">草稿</span></td>
+    <td>
+        <a onclick="PublishArticle(this)" title="发布">
+            <i class="layui-icon">&#xe609;</i>
+        </a>
+        <a onclick="EditArticle(this)" title="编辑">
+            <i class="layui-icon">&#xe642;</i>
+        </a>
+        <a onclick="DeleteArticle(this)" title="删除">
+            <i class="layui-icon">&#xe640;</i>
+        </a>
+    </td>
+</tr>
+<tr>
+    <td>许闲心</td>
+    <td>2016-11-28</td>
+    <td>于千万人之中遇见你</td>
+    <td>人生就像是一场修行</td>
+    <td>43</td>
+    <td><span class="layui-btn layui-btn-xs layui-bg-orange">待审核</span></td>
+    <td>
+
+    </td>
+</tr>
+<tr>
+    <td>许闲心</td>
+    <td>2016-11-28</td>
+    <td>于千万人之中遇见你</td>
+    <td>人生就像是一场修行</td>
+    <td>43</td>
+    <td><span class="layui-btn layui-btn-xs layui-bg-red">已下架</span></td>
+    <td>
+        <a onclick="PublishArticle(this)" title="发布">
+            <i class="layui-icon">&#xe609;</i>
+        </a>
+        <a onclick="EditArticle(this)" title="编辑">
+            <i class="layui-icon">&#xe642;</i>
+        </a>
+        <a onclick="DeleteArticle(this)" title="删除">
+            <i class="layui-icon">&#xe640;</i>
+        </a>
+    </td>
+</tr>
+<tr>
+    <td>许闲心</td>
+    <td>2016-11-28</td>
+    <td>于千万人之中遇见你</td>
+    <td>人生就像是一场修行</td>
+    <td>43</td>
+    <td><span class="layui-btn layui-btn-xs layui-bg-cyan">已锁定</span></td>
+    <td>
+
+    </td>
+</tr>

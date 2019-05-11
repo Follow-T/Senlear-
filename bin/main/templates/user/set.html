@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<!--引入头部-->
+<head th:replace="~{index::senlear_head}">
+</head>
+
+<body>
+
+  <!--用户顶部状态条-->
+  <div th:replace="~{/user/index::senlear_userTopBar}" class="fly-header layui-bg-black">
+  </div>
+
+  <div class="layui-container fly-marginTop fly-user-main">
+    <!--引入用户侧边导航栏-->
+    <ul th:replace="~{user/index::senlear_userSidebar}" class="layui-nav layui-nav-tree layui-inline" lay-filter="user">
+    </ul>
+
+    <div class="site-tree-mobile layui-hide">
+      <i class="layui-icon">&#xe602;</i>
+    </div>
+    <div class="site-mobile-shade"></div>
+
+    <div class="site-tree-mobile layui-hide">
+      <i class="layui-icon">&#xe602;</i>
+    </div>
+    <div class="site-mobile-shade"></div>
+
+
+    <div class="fly-panel fly-panel-user" pad20>
+      <div class="layui-tab layui-tab-brief" lay-filter="user">
+        <ul class="layui-tab-title" id="LAY_mine">
+          <li class="layui-this" lay-id="info">我的资料</li>
+          <li lay-id="avatar">头像</li>
+          <li lay-id="pass">密码</li>
+          <li lay-id="bind">帐号绑定</li>
+        </ul>
+        <div class="layui-tab-content" style="padding: 20px 0;">
+          <div class="layui-form layui-form-pane layui-tab-item layui-show">
+            <form method="post">
+              <div class="layui-form-item">
+                <label for="L_email" class="layui-form-label">邮箱</label>
+                <div class="layui-input-inline">
+                  <input type="text" id="email" name="email" th:value="${user.email}" required lay-verify="email" autocomplete="off" value=""
+                    class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">如果您在邮箱已激活的情况下，变更了邮箱，需<a href="activate.html"
+                    style="font-size: 12px; color: #4f99cf;">重新验证邮箱</a>
+                </div>
+              </div>
+
+              <div class="layui-form-item">
+                <label for="tel" class="layui-form-label">手机号</label>
+                <div class="layui-input-inline">
+                  <input type="tel" id="tel" name="phonenumber" th:value="${user.phonenumber}" autocomplete="off" value="" class="layui-input"
+                    lay-verify="tel">
+                </div>
+              </div>
+
+              <div class="layui-form-item">
+                <label for="L_username" class="layui-form-label">昵称</label>
+                <div class="layui-input-inline">
+                  <input type="text" id="nick_name" th:value="${user.name}" name="name" required lay-verify="nick_name" autocomplete="off"
+                    value="" class="layui-input">
+                </div>
+                <div class="layui-inline">
+                  <div class="layui-input-inline">
+                    <input type="radio" name="sex" value="0" th:field="*{user.sex}" title="男">
+                    <input type="radio" name="sex" value="1" th:field="*{user.sex}" title="女">
+                  </div>
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label for="L_address" class="layui-form-label">地址</label>
+                <div class="layui-input-inline">
+                  <input type="text" id="address" name="address" th:value="${user.address}" autocomplete="off" value="" lay-verify="address"
+                    class="layui-input">
+                </div>
+              </div>
+              <div class="layui-form-item layui-form-text">
+                <label for="L_sign" class="layui-form-label">个人签名</label>
+                <div class="layui-input-block">
+                  <textarea placeholder="随便写些什么刷下存在感" id="sign" th:text="${user.sign}" name="sign" autocomplete="off" lay-verify="sign"
+                    class="layui-textarea" style="height: 80px;"></textarea>
+                </div>
+              </div>
+              <div class="layui-form-item layui-form-text">
+                <label for="L1_sign" class="layui-form-label">个人简介</label>
+                <div class="layui-input-block">
+                  <textarea placeholder="个人简介" id="L1_sign" th:text="${user.info}" name="info" autocomplete="off" lay-verify="L1_sign"
+                    class="layui-textarea" style="height: 40px;"></textarea>
+                </div>
+              </div>
+
+
+
+              <div class="layui-form-item">
+                <button class="layui-btn" key="set-mine" lay-submit="formRemark" lay-filter="formRemark">确认修改</button>
+              </div>
+            </form>
+          </div>
+
+           <div class="layui-form layui-form-pane layui-tab-item">
+            <div class="layui-form-item">
+              <div class="avatar-add">
+                <p>建议尺寸168*168，支持jpg、png、gif，最大不能超过1M</p>
+                <button type="button" class="layui-btn" id="img_upload">
+                  <i class="layui-icon">&#xe67c;</i>上传头像
+                </button>
+                <img  th:src="${#authentication.principal.avatar} == null ? 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg' : ${#authentication.principal.avatar}" >
+                <p id="demoText"></p>
+                <span class="loading"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="layui-form layui-form-pane layui-tab-item">
+            <form action="/user/repass" method="post">
+              <div class="layui-form-item">
+                <label for="L_nowpass" class="layui-form-label">当前密码</label>
+                <div class="layui-input-inline">
+                  <input type="password" id="oldPass" name="oldPass" required lay-verify="oldPass" autocomplete="off"
+                    class="layui-input">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label for="L_pass" class="layui-form-label">新密码</label>
+                <div class="layui-input-inline">
+                  <input type="password" id="newPass" name="newPass" required lay-verify="newPass" autocomplete="off"
+                    class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">6到16个字符</div>
+              </div>
+              <div class="layui-form-item">
+                <label for="L_repass" class="layui-form-label">确认密码</label>
+                <div class="layui-input-inline">
+                  <input type="password" id="repass" name="repass" required lay-verify="repass" autocomplete="off"
+                    class="layui-input">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <button class="layui-btn" key="set-mine" lay-submit="formRemark1" lay-filter="formRemark1">确认修改</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="layui-form layui-form-pane layui-tab-item">
+            <ul class="app-bind">
+              <li class="fly-msg app-havebind">
+                <i class="iconfont icon-qq"></i>
+                <span>已成功绑定，您可以使用QQ帐号直接登录Fly社区，当然，您也可以</span>
+                <a href="javascript:;" class="acc-unbind" type="qq_id">解除绑定</a>
+
+                <!-- <a href="" onclick="layer.msg('正在绑定微博QQ', {icon:16, shade: 0.1, time:0})" class="acc-bind" type="qq_id">立即绑定</a>
+                <span>，即可使用QQ帐号登录Fly社区</span> -->
+              </li>
+              <li class="fly-msg">
+                <i class="iconfont icon-weibo"></i>
+                <!-- <span>已成功绑定，您可以使用微博直接登录Fly社区，当然，您也可以</span>
+                <a href="javascript:;" class="acc-unbind" type="weibo_id">解除绑定</a> -->
+
+                <a href="" class="acc-weibo" type="weibo_id"
+                  onclick="layer.msg('正在绑定微博', {icon:16, shade: 0.1, time:0})">立即绑定</a>
+                <span>，即可使用微博帐号登录Fly社区</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!--引入角页-->
+  <div th:replace="~{index::senlear_footer}" class="fly-footer">
+  </div>
+
+  <script src="/res/layui/layui.js"></script>
+  <script>
+    var myVarate = 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg';
+    layui.use(['laydate', 'laypage', 'layer', 'table', 'carousel', 'upload', 'element'], function () {
+        var layer = layui.layer, upload = layui.upload, $ = layui.$, demoText = $('#demoText');
+        var username='[[${#authentication.principal.username}]]';
+        $('.img').attr('src', myVarate);//页面初始化的时候渲染图片
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#img_upload',
+            url: '/'+username+'/upload',//这里填写你的上传地址
+            accept: 'images',
+            method: 'post',
+            size:1024,
+            exts: 'jpg|png|gif|',
+            acceptMime: 'image/*'
+            , before: function (obj) {
+                /*如果您不想用上面的URL 进行上传,也可以在这里,添加你的上传方式*/
+                obj.preview(function (index, file, result) {
+                    $('.img').attr('src', result);//图片链接（base64）
+                });
+            }, done: function (res) {
+                if (res.status == 201) {//长传成功(具体返回status 看后台是怎么处理的)
+                    return layer.msg('上传失败,操作用户不为本人!');
+                } else if(res.code == 202){
+                    layer.msg('请先登录!');
+                }else{
+                	layer.msg('图片上传成功!');
+                }
+            }
+            , error: function () {
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+            }
+        });
+        //上传失败监听重试按钮的操作
+        demoText.find('.demo-reload').on('click', function () {
+            uploadInst.upload();
+        });
+    });
+	</script>
+
+  <script>
+  	var username='[[${#authentication.principal.username}]]';
+    layui.use(['form'], function () {
+      var form = layui.form;
+      var $ = layui.jquery;
+      //提交信息验证
+      form.verify({
+        email: function (value) {
+          value = $.trim($("#email").val());
+          var reg = new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"); //正则表达式
+          if (value == "") {
+            return "邮箱为空";
+          } else if (!reg.test(value)) {
+            return "邮箱格式错误！";
+          }
+
+        },
+        nick_name: function (value) {
+          value = $.trim($("#nick_name").val());
+          if (value == "") return "昵称为空";
+
+        },
+        oldPass: function (value) {
+          value = $.trim($("#oldPass").val());
+          if (value == "")
+            return "当前密码为空";
+        },
+        newPass: function (value) {
+          value = $.trim($("#newPass").val());
+          value1 = $.trim($("#repass").val());
+          if (value == "") {
+            return "新密码为空";
+          } else if (value1 == "") {
+            return "确认密码为空";
+          } else if (value != $("#repass").val()) {
+            return "修改密码不一致";
+          }
+        }
+      });
+      function submitMessage(message) {
+        $.ajax({
+          url: '/'+username+'/changeUserDetail',
+          type: 'POST',
+          data: message,
+          //这两个设置项必填
+          contentType: false,
+          processData: false,
+          dataType: 'jsonp',
+          calback: "callback",
+          cache: false,
+          success: function (data) {
+            console.log(data);
+            if (data['status'] == '200') {
+              layer.msg("保存成功", { icon: 1, time: 1000 });
+            } else {
+              layer.msg('修改失败!', { icon: 2, time: 1000 });
+              //console.log(data);
+            }
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+            alert(XMLHttpRequest.status);
+            alert(XMLHttpRequest.readyState);
+            alert(textStatus);
+          }
+        });
+
+      }
+      //用户提交
+
+      form.on('submit(formRemark)', function (data) {
+        var index = layer.load(1);
+        //信息修改
+        setTimeout(function () {
+          layer.close(index);
+          //var content = data.field.editorContent;
+          var formData = new FormData();
+
+          formData.append('email', $("#email").val());
+          formData.append('phonenumber', $("#tel").val());
+          formData.append('name', $("#nick_name").val());
+          formData.append('sex', $(":radio:checked").val());
+          formData.append('address', $("#address").val());
+          formData.append('sign', $("#sign").val());
+          formData.append('info', $("#L1_sign").val());
+		  
+		
+          submitMessage(formData);
+
+          $("#email").val("");
+          $("#tel").val("");
+          $("#nickname").val("");
+          $("#address").val("");
+          $("#sign").val("");
+          $("#L1_sign").val("");
+          
+          window.location.href='/'+username+'/set';
+
+        }, 500);
+        return false;
+      });
+
+      function submitMessage1(message) {
+        $.ajax({
+          url: '/'+username+'/changeUserPassword',
+          type: 'POST',
+          data: message,
+          //这两个设置项必填
+          contentType: false,
+          processData: false,
+          dataType: 'jsonp',
+          calback: "callback",
+          cache: false,
+          success: function (data) {
+            console.log(data);
+            if (data['status'] == '200') {
+              layer.msg("修改成功", { icon: 1, time: 1000 });
+              window.location.href="/logout";
+              var emailData = new FormData();
+              emailData.append('email',$("#email").val());
+              emailData.append('type','updatePwd');
+              $.ajax({
+                  url: '/sendemail',
+                  type: 'POST',
+                  data: emailData,
+                  //这两个设置项必填
+                  contentType: false,
+                  processData: false,
+                  dataType: 'jsonp',
+                  calback: "callback",
+                  cache: false,
+                  success: function (data) {
+                   	 console.log(data);
+                  },
+                  error: function (XMLHttpRequest, textStatus, errorThrown) {
+                      alert(XMLHttpRequest.status);
+                  }
+            });
+            } else {
+              layer.msg('修改失败!'+data['data']+'', { icon: 2, time: 1000 });
+            }
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+            alert(XMLHttpRequest.status);
+            alert(XMLHttpRequest.readyState);
+            alert(textStatus);
+          }
+        });
+
+      }
+      form.on('submit(formRemark1)', function (data) {
+        var index = layer.load(1);
+        //密码提交
+        setTimeout(function () {
+          layer.close(index);
+          //var content = data.field.editorContent;
+          var formData = new FormData();
+
+          formData.append('oldPass', $("#oldPass").val());
+          formData.append('newPass', $("#newPass").val());
+
+          submitMessage1(formData);
+
+          $("#oldPass").val("");
+          $("#newPass").val("");
+          $("#repass").val("");
+        }, 500);
+        return false;
+      });
+
+
+
+
+    });
+  </script>
+
+  <script>
+    layui.cache.page = 'user';
+    layui.cache.user = {
+      username: '游客'
+      , uid: -1
+      , avatar: '../../res/images/avatar/00.jpg'
+      , experience: 83
+      , sex: '男'
+    };
+    layui.config({
+      version: "2.0.0"
+      , base: '../../res/mods/'
+    }).extend({
+      fly: 'index'
+    }).use('fly');
+  </script>
+  <script>
+    layui.use('upload', function(){
+      var $ = layui.jquery
+              ,upload = layui.upload;
+
+      //普通图片上传
+      var uploadInst = upload.render({
+        elem: '#test1'
+        ,url: '/index1'
+        ,before: function(obj){
+          //预读本地文件示例，不支持ie8
+          obj.preview(function(index, file, result){
+            $('#demo1').attr('src', result); //图片链接（base64）
+          });
+        }
+        ,done: function(res){
+          //上传成功
+          return layer.msg(res.msg,{icon: res.status,time: 2000});
+        }
+      });
+
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5" >
+<head>
+  <meta charset="utf-8">
+  <title th:text="${article.title}">title</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="keywords" content="fly,layui,前端社区">
+  <meta name="description" content="Fly社区是模块化前端UI框架Layui的官网社区，致力于为web开发提供强劲动力">
+  <link rel="stylesheet" href="/res/layui/css/layui.css">
+  <link rel="stylesheet" href="/res/css/global.css">
+  <title sec:authentication="name"></title>
+</head>
+<body>
+<!--用户顶部状态条-->
+<div th:replace="~{/user/index::senlear_userTopBar}" class="fly-header layui-bg-black">
+</div>
+
+<div th:replace="~{/index::senlear_headnav}" class="fly-panel fly-column">
+</div>
+<div class="layui-container">
+  <div class="layui-row layui-col-space15">
+  	<div class="layui-col-md4" style="float: right";>
+      <dl class="fly-panel fly-list-one"  >
+        <dt class="fly-panel-title">本周热议</dt>
+        
+        <dd th:each="article : ${articleHost}" >
+          <a th:href="'/'+${article.getUser().username} + '/article/'+ ${article.id}"  th:title="${article.title}" th:text="${article.title}">基于 layui 的极简社区页面模版</a>
+          <span ><i class="iconfont icon-pinglun1"></i> [[${article.commentsize}]]</span>
+        </dd>
+      </dl>
+
+      <div class="fly-panel" th:replace="~{/index::senlear_echo}">
+ 
+      </div>
+
+      <div class="fly-panel" style="padding: 20px 0; text-align: center;">
+        <img src="/res/weixin.png" style="max-width: 100%;" alt="layui">
+        <p style="position: relative; color: #666;">微信扫码获取更多</p>
+      </div>
+
+    </div>
+    <div class="layui-col-md8 content detail">
+    	
+      <div class="fly-panel detail-box" style="overflow:hidden">
+        <h1 th:text="${article.title}">Fly Template v3.0，基于 layui 的极简社区页面模版</h1>
+        <div class="fly-detail-info">
+          <span class="layui-badge  fly-detail-column"></span>
+          <span class="fly-list-nums"> 
+            <a th:text="${article.commentsize}" href="#comment"><i class="iconfont" title="回答">&#xe60c;</i> 66</a>
+            <i class="iconfont"  title="人气">&#xe60b;</i>[[${article.reading}]]
+          </span>
+        </div>
+        <div class="detail-about">
+          <a class="fly-avatar" th:href="'/'+${article.getUser().username} + '/home'">
+             <img th:src="${article.getUser().avatar} == null ? 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg' : ${article.getUser().avatar}" alt="Tg">
+          </a>
+          <div class="fly-detail-user">
+            <a href="../user/home.html" class="fly-link">
+              <cite th:text="${user.name}">贤心</cite>
+              <i class="iconfont icon-renzheng" title="认证信息：{{ rows.user.approve }}"></i>
+              <i class="layui-badge fly-badge-vip">VIP3</i>
+            </a>
+            <span th:text="${user.createTime}">2017-11-30</span>
+          </div>
+          <div class="detail-hits" id="LAY_jieAdmin" data-id="123">
+            <span style="padding-right: 10px; color: #FF7200">悬赏：60飞吻</span>  
+            <span style="cursor:pointer;"   th:unless="${isCollect}" class="layui-btn layui-btn-xs jie-admin" type="edit" id="collect" th:attr="articleid=${article.id}" ifcollect="no">添加收藏</span>
+            <span style="cursor:pointer;"   th:if="${isCollect}" class="layui-btn layui-btn-xs jie-admin" type="edit" id="collect" th:attr="articleid=${article.id}" ifcollect="yes">取消收藏</span>
+          </div>
+        </div>
+        <div th:utext="${article.content}" class="detail-body photos">
+         
+          
+       
+        </div>
+      </div>
+
+      <div class="fly-panel detail-box" id="flyReply" th:fragment="senlear_reply">
+        <fieldset class="layui-elem-field layui-field-title" style="text-align: center;">
+          <legend>回帖</legend>
+        </fieldset>
+
+        <ul class="jieda" id="jieda" th:attr="articleid=${article.id}">
+          <li data-id="111" class="jieda-daan"   th:each="comment : ${commentList}" th:if=" ${comment.userid} eq ${article.getUser().id}" th:attr="commentid=${comment.id}">
+            <a name="item-1111111111"></a>
+            <div class="detail-about detail-about-reply">
+              <a class="fly-avatar" href="" th:href="'/'+${comment.username}+'/home'">
+                <img th:src="${comment.useravatar} == null ? 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg' : ${comment.useravatar}" alt="Tg">
+              </a>
+              <div class="fly-detail-user" >
+                <a href=""  th:href="'/'+${comment.username}+'/home'" class="fly-link" id='replyuser'>
+                  <cite th:text="${comment.name}"></cite>
+                  <i class="iconfont icon-renzheng" title="认证信息：XXX"></i>
+                  <i class="layui-badge fly-badge-vip">VIP3</i>              
+                </a>
+                
+                <span th:if=" ${comment.userid} eq ${article.getUser().id}">(楼主)</span>
+              </div>
+
+              <div class="detail-hits">
+                <span th:text="${comment.createTime}">2017-11-30</span>
+              </div>
+
+              <i class="iconfont icon-caina" title="最佳答案"></i>
+            </div>
+            <div class="detail-body jieda-body photos" >
+              <p th:text="${comment.content}">香菇那个蓝瘦，这是一条被采纳的回帖</p>
+            </div>
+            <div class="jieda-reply" th:attr="commentid=${comment.id}">
+              <span class="jieda-zan " >
+                <i class="iconfont icon-zan" id="icon-zan" onclick="zancomment(this)"></i>
+                <em th:text="${comment.like}">66</em>
+              </span>
+              <span type="reply" id='reply' >
+                <i class="iconfont icon-svgmoban53"></i>
+                	回复
+              </span>
+              <div class="jieda-admin"  sec:authorize="isAuthenticated()">
+                
+                <span type="del" th:if=" ${#authentication.principal.id} eq ${article.getUser().id}">删除</span>
+                <!-- <span class="jieda-accept" type="accept">采纳</span> -->
+              </div>
+            </div>
+            <!--  回复    -->
+            <div th:each="reply : ${comment.getListReplies()}">
+            <div class="detail-about detail-about-reply">
+              <a class="fly-avatar"  th:href="'/'+${reply.username}+'/home'">
+                <img th:src="${reply.useravatar} == null ? 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg' : ${reply.useravatar}" alt="Tg">
+              </a>
+              <div class="fly-detail-user">
+                <a  th:href="'/'+${reply.username}+'/home'" class="fly-link" id='replyuser'>
+                  <cite th:text="${reply.name}"></cite>       
+                </a>
+				<span>回复:</span>
+				<a href="" class="fly-link">
+                  <cite th:text="${reply.toname}">贤心</cite>       
+                </a>
+              </div>
+              <div class="detail-hits">
+                <span th:text="${reply.createTime}">2017-11-30</span>
+              </div>
+            </div>
+            <div class="detail-body jieda-body photos">
+              <p th:text="${reply.content}">蓝瘦那个香菇，这是一条没被采纳的回帖</p>
+            </div>
+            <div class="jieda-reply" th:attr="replyid=${reply.id}">
+              <span class="jieda-zan" >
+                <i class="iconfont icon-zan" onclick="zancomment(this)"></i>
+                <em th:text="${reply.like}">0</em>
+              </span>
+              <span type="reply" id='reply'>
+                <i class="iconfont icon-svgmoban53"></i>
+                回复
+              </span>
+              <div class="jieda-admin"  sec:authorize="isAuthenticated()">
+                
+                <span type="del" th:if=" ${#authentication.principal.id} eq ${article.getUser().id}">删除</span>
+                <span class="jieda-accept" type="accept">采纳</span>
+              </div>
+            </div>
+            </div>
+          </li>
+          <!-- ------------------------------------------ -->
+          <li data-id="111" th:each="comment : ${commentList}" th:if=" ${comment.userid} ne ${article.getUser().id}" th:attr="commentid=${comment.id}">
+            <a name="item-1111111111"></a>
+            <div class="detail-about detail-about-reply">
+              <a class="fly-avatar" href="" th:href="'/'+${comment.username}+'/home'">
+                <img th:src="${comment.useravatar} == null ? 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg' : ${comment.useravatar}" alt="Tg">
+              </a>
+              <div class="fly-detail-user">
+                <a href="" th:href="'/'+${comment.username}+'/home'" class="fly-link" id='replyuser'>
+                  <cite th:text="${comment.name}">贤心</cite>       
+                </a>
+              </div>
+              <div class="detail-hits">
+                <span th:text="${comment.createTime}">2017-11-30</span>
+              </div>
+            </div>
+            <div class="detail-body jieda-body photos">
+              <p th:text="${comment.content}">蓝瘦那个香菇，这是一条没被采纳的回帖</p>
+            </div>
+            <div class="jieda-reply" th:attr="commentid=${comment.id}">
+              <span class="jieda-zan" >
+                <i class="iconfont icon-zan"  onclick="zancomment(this)"></i>
+                <em th:text="${comment.like}">66</em>
+              </span>
+              <span type="reply" id='reply'>
+                <i class="iconfont icon-svgmoban53"></i>
+              	  回复
+              </span>
+              <div class="jieda-admin" sec:authorize="isAuthenticated()" >
+               
+                <span type="del" th:if=" ${#authentication.principal.id} eq ${article.getUser().id}">删除</span>
+                <span class="jieda-accept" type="accept">采纳</span>
+              </div>
+            </div>
+            <div th:each="reply : ${comment.getListReplies()}">
+            <div class="detail-about detail-about-reply" >
+              <a class="fly-avatar" href="" th:href="'/'+${reply.username}+'/home'" >
+                <img th:src="${reply.useravatar} == null ? 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg' : ${reply.useravatar}" alt="Tg">
+              </a>
+              <div class="fly-detail-user">
+                <a href=""  th:href="'/'+${reply.username}+'/home'" class="fly-link" id='replyuser'>
+                  <cite th:text="${reply.name}"></cite>       
+                </a>
+				<span>回复:</span>
+				<a href="" class="fly-link">
+                  <cite th:text="${reply.toname}">贤心</cite>       
+                </a>
+              </div>
+              <div class="detail-hits">
+                <span th:text="${reply.createTime}">2017-11-30</span>
+              </div>
+            </div>
+            <div class="detail-body jieda-body photos">
+              <p th:text="${reply.content}">蓝瘦那个香菇，这是一条没被采纳的回帖</p>
+            </div>
+            <div class="jieda-reply" th:attr="replyid=${reply.id}">
+              <span class="jieda-zan" >
+                <i class="iconfont icon-zan" onclick="zancomment(this)"></i>
+                <em th:text="${reply.like}">0</em>
+              </span>
+              <span type="reply" id='reply'>
+                <i class="iconfont icon-svgmoban53"></i>
+                	回复
+              </span>
+              <div class="jieda-admin" sec:authorize="isAuthenticated()" >
+                <span type="del" th:if=" ${#authentication.principal.id} eq ${article.getUser().id}">删除</span>
+                <span class="jieda-accept" type="accept">采纳</span>
+              </div>
+            </div>
+            </div>
+          </li>
+          
+          <!-- 无数据时 -->
+          <!-- <li class="fly-none">消灭零回复</li> -->
+        </ul>
+        
+       <div class="layui-form layui-form-pane">
+            <div class="layui-form-item layui-form-text">
+              <a name="comment"></a>
+              <div class="layui-input-block">
+                <textarea id="L_content" name="content" required lay-verify="required" placeholder="请输入内容"  class="layui-textarea" style="height: 150px;"></textarea>
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <input type="hidden" name="jid" value="123">
+              <button class="layui-btn" onclick="reply()" >提交回复</button>
+            </div>
+        </div>
+       
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+<div class="fly-footer" th:replace="~{/index::senlear_footer}">
+  
+</div>
+
+<script src="/res/layui/layui.js"></script>
+<script th:src="@{/res/js/article.js}"></script>
+<script src="http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"></script>
+<script>
+$("#collect").click(function(){
+	var articleid=$("#collect").attr("articleid");
+	var ifFollow=$("#collect").attr("ifcollect");
+	var type;
+	if(ifFollow=="no"){
+		type=1;
+	}else if(ifFollow=="yes"){
+		type=2;
+	}
+	var formData = new FormData();
+    formData.append('type',type);
+    var userid=$("#userid").attr("userid");
+	var url="/collect/"+userid+"/"+articleid;
+	$.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            //这两个设置项必填
+            contentType: false,
+            processData: false,
+            dataType: 'jsonp',
+            calback: "callback",
+            cache: false,
+            success: function (data) {
+              console.log(data);
+          　　		if(data['status']=='200'){
+          　　			
+                    layer.msg(data['data'], {icon: 1,time:1000 });
+                    setTimeout(function (){
+                    	location.reload();
+                    },1000);
+                    
+              }else{
+                    layer.msg('操作失败!',{icon:2,time:1000});
+              }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+
+                          alert(XMLHttpRequest.status);
+                          alert(XMLHttpRequest.readyState);
+                          alert(textStatus);
+            }
+      });
+
+})
+layui.cache.page = 'jie';
+layui.cache.user = {
+  username: '游客'
+  ,uid: -1
+  ,avatar: '../../res/images/avatar/00.jpg'
+  ,experience: 83
+  ,sex: '男'
+};
+layui.config({
+  version: "3.0.0"
+  ,base: '/res/mods/'
+}).extend({
+  fly: 'index'
+}).use(['fly', 'face'], function(){
+  var $ = layui.$
+  ,fly = layui.fly;
+
+  //如果你是采用模版自带的编辑器，你需要开启以下语句来解析。
+  /*
+  $('.detail-body').each(function(){
+    var othis = $(this), html = othis.html();
+    othis.html(fly.content(html));
+  });
+  */
+});
+
+$("#index").click(function(){
+	window.location.href ="/index#type=article"
+});
+$("#question").click(function(){
+    window.location.href ="/index#type=question"
+});
+$("#share").click(function(){
+    window.location.href ="/index#type=share"
+});
+$("#advice").click(function(){
+    window.location.href ="/index#type=advice"
+});
+$("#life").click(function(){
+    window.location.href ="/index#type=life"
+});
+$("#resource").click(function(){
+    window.location.href ="/index#type=resource"
+});
+$("#joke").click(function(){
+    window.location.href ="/index#type=joke"
+});
+$("#science").click(function(){
+    window.location.href ="/index#type=science"
+});
+$("#other").click(function(){
+    window.location.href ="/index#type=other"
+});
+
+</script>
+
+</body>
+</html>

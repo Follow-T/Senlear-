@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<!--引入头部-->
+<head th:replace="~{index::senlear_head}">
+</head>
+<body>
+<!--引入顶部导航-->
+<div th:replace="~{/user/index::senlear_userTopBar}" class="fly-header layui-bg-black">
+</div>
+
+<div class="layui-container fly-marginTop">
+  <div class="fly-panel fly-panel-user" pad20>
+    <div class="layui-tab layui-tab-brief" lay-filter="user">
+      <ul class="layui-tab-title">
+        <li class="layui-this">登入</li>
+        <li><a href="/reg">注册</a></li>
+      </ul>
+      <div class="layui-form layui-tab-content" id="LAY_ucm" style="padding: 20px 0;">
+        <div class="layui-tab-item layui-show">
+          <div class="layui-form layui-form-pane">
+            <form method="post">
+              <div class="layui-form-item">
+                <label for="L_email" class="layui-form-label">邮箱</label>
+                <div class="layui-input-inline">
+                  <input type="email" id="user_email"name="username" lay-verify="user_email" autocomplete="off" placeholder="请输入邮箱" class="layui-input">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label for="L_pass" class="layui-form-label">密码</label>
+                <div class="layui-input-inline">
+                  <input type="password" id="user_password" name="password" lay-verify="user_password" autocomplete="off" placeholder="请输入密码" class="layui-input">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label for="L_vercode" class="layui-form-label">人类验证</label>
+                <div class="layui-input-inline">
+                  <input type="text" id="user_check" name="user_check" lay-verify="user_check" autocomplete="off" placeholder="请输入验证码" class="layui-input">
+                </div>
+                <div class="layui-form-mid">
+                  <span style="color: #c00;"><img id="regimg" src="/check.jpg" onclick="refresh()"></img></span>
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <button class="layui-btn" lay-submit="formRemark" lay-filter="formRemark">立即登录</button>
+                <span style="padding-left:20px;">
+                  <a href="forget.html">忘记密码？</a>
+                </span>
+              </div>
+              <div class="layui-form-item fly-form-app">
+                <span>或者使用社交账号登入</span>
+                <a href="" onclick="layer.msg('正在通过QQ登入', {icon:16, shade: 0.1, time:0})" class="iconfont icon-qq" title="QQ登入"></a>
+                <a href="" onclick="layer.msg('正在通过微博登入', {icon:16, shade: 0.1, time:0})" class="iconfont icon-weibo" title="微博登入"></a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{index::senlear_footer}" class="fly-footer">
+</div>
+
+<script  src="/res/layui/layui.js" th:src="@{/res/layui/layui.js}"></script>
+<script>
+function refresh() { 
+    var url = "/check.jpg?number="+Math.random(); 
+    document.getElementById('regimg').src=url;  
+}
+layui.use(['form', 'layedit'], function () {
+	
+  var form = layui.form;
+  var $ = layui.jquery;
+  var layedit = layui.layedit;
+  function refresh() { 
+	    var url = "/check.jpg?number="+Math.random(); 
+	    $("#regimg").attr("src",url);  
+	}
+
+  var editIndex = layedit.build('remarkEditor', {
+      height: 150,
+      tool: ['face', '|', 'left', 'center', 'right', '|', 'link'],
+  });
+  //用户登录前端验证
+  form.verify({
+      content: function (value) {
+          value = $.trim(layedit.getText(editIndex));
+          if (value == "") return "自少得有一个字吧";
+          layedit.sync(editIndex);
+      },
+      user_email: function (value) {
+          value = $.trim($("#user_email").val());
+          var reg = new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"); //正则表达式
+          if (value == ""){
+              return "邮箱为空";
+          }else if(!reg.test(value)){
+              return "邮箱格式错误！";
+          }
+          
+      },
+      user_password: function (value) {
+          value = $.trim($("#user_password").val());
+          if (value == "") return "密码为空";
+          
+      },
+      user_check: function (value) {
+          value = $.trim($("#user_check").val());
+          if (value == "") return "验证码为空";
+          
+      }
+  });
+  function submitMessage(message){
+      
+      $.ajax({
+            url: '/login',
+            type: 'POST',
+            data: message,
+            //这两个设置项必填
+            contentType: false,
+            processData: false,
+            dataType: 'jsonp',
+            calback: "callback",
+            cache: false,
+            success: function (data) {
+              console.log(data);
+          　　		if(data['status']=='200'){
+                    layer.msg("登录成功", {icon: 1,time:1000 });
+                    setTimeout(function (){
+                      if(data['data']==null||data['data']==""){
+                        window.location.href="/index";
+                      }else{
+                        window.location.href=data['data'];
+                      }
+
+                    },1000);
+
+              }else{
+                    layer.msg('登录失败!',{icon:2,time:1000});
+                    refresh();
+                    
+              }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+
+                          alert(XMLHttpRequest.status);
+                          alert(XMLHttpRequest.readyState);
+                          alert(textStatus);
+            }
+      });
+
+  }
+  //用户登录提交
+  form.on('submit(formRemark)',function (data) {
+      var index = layer.load(1);
+      //模拟评论提交
+      setTimeout(function () {
+          layer.close(index);
+          var content = data.field.editorContent;
+          var formData = new FormData();
+          
+          formData.append('username',$("#user_email").val());
+          formData.append('password',$("#user_password").val());
+          formData.append('checkcode',$("#user_check").val());
+         
+         
+         
+          submitMessage(formData);
+
+
+         
+      }, 500);
+      return false;
+  });
+});
+</script>
+<script>
+layui.cache.page = '';
+layui.cache.user = {
+  username: '游客'
+  ,uid: -1
+  ,avatar: '../res/images/avatar/00.jpg'
+  ,experience: 83
+  ,sex: '男'
+};
+layui.config({
+  version: "3.0.0"
+  ,base: '/res/mods/' //这里实际使用时，建议改成绝对路径
+}).extend({
+  fly: 'index'
+}).use('fly');
+</script>
+
+</body>
+</html>

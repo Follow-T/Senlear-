@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>SenlearFS文件服务器</title>
+    <link rel="stylesheet" href="/res/layui/css/layui.css">
+    <link rel="stylesheet" th:href="@{/res/css/global.css}" href="/res/css/global.css">
+    <link rel="stylesheet" href="/res/common.css">
+    <style>
+        .formBtn {
+            background: #FBFBFB;
+            border: 1px solid #e6e6e6;
+            color: #333;
+        }
+
+        .formBtn:hover {
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+
+<!--用户顶部状态条-->
+<div th:replace="~{/user/index::senlear_userTopBar}" class="fly-header layui-bg-black">
+</div>
+<div class="layui-container" style="padding-top: 15px;">
+
+    <div class="layui-card">
+        <div class="layui-card-header">分享简述</div>
+        <div class="layui-card-body">
+            <div class="layui-form layui-form-pane">
+                <div class="layui-form-item">
+                    <div class="layui-col-md3">
+                        <label class="layui-form-label">所在专栏</label>
+                        <div class="layui-input-block">
+                            <select id="type" lay-verify="required" name="type" z-index="9999" lay-filter="column">
+                                <option></option>
+                                <option value="0">提问</option>
+                                <option value="1">分享</option>
+                                <option value="2">讨论</option>
+                                <option value="3">建议</option>
+                                <option value="4">公告</option>
+                                <option value="5">动态</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-col-md9">
+                        <label class="layui-form-label">标题</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="title" name="title" required lay-verify="required" autocomplete="off" class="layui-input">
+                            <!-- <input type="hidden" name="id" value="{{d.edit.id}}"> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-card">
+        <div class="layui-card-header">分享简述</div>
+        <div class="layui-card-body">
+            <div class="layui-form layui-form-pane">
+                <div class="layui-form-item">
+                    <div class="layui-col-md12">
+                        <textarea id="summary" placeholder="文章概要"  required lay-verify="required" name="summary"  autocomplete="off" class="layui-textarea" style="height: 80px;"></textarea>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="layui-card">
+        <div class="layui-card-header">分享概括与描述</div>
+        <div class="layui-card-body">
+            <textarea id="richTV" style="display: none;">
+            </textarea>
+        </div>
+        <button id="submitShare" class="layui-btn" style="margin:10px; ">完成分享</button>
+        <a href="/index"class="layui-btn layui-btn-warm" style="margin:10px; ">返回主页</a>
+    </div>
+
+</div>
+
+<script type="text/javascript" src="/res/layui/layui.js"></script>
+<script type="text/javascript" src="/res/config.js"></script>
+<script>
+    layui.use(['jquery', 'layer', 'element', 'form', 'layedit'], function () {
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var element = layui.element;
+        var form = layui.form;
+        var layedit = layui.layedit;
+
+        // 渲染编辑器
+        var edtIndex = layedit.build('richTV', {
+            height: 200,
+            tool: ['strong', 'italic', 'underline', 'del', '|', 'left', 'center', 'right', 'link', 'unlink', 'face']
+        });
+
+        $("#submitShare").click(function() {
+            var url=location.href; //取得整个地址栏
+            var num=url.indexOf("?")
+            url=url.substr(num+1); //取得所有参数   stringvar.substr(start [, length ]s
+            var content = layedit.getContent(edtIndex);
+            var title = $("#title").val();
+            var type = $("#type").val();
+            var summary = $("#summary").val();
+
+            sumbit(title,content,url,type,summary);
+        });
+        // 重写帮助事件
+        $('.layedit-tool-help').removeAttr('layedit-event');
+        $('.layedit-tool-help').on('click', function (e) {
+            window.open('https://gitee.com/whvse/easy-fs');
+        });
+        // 重写图片事件
+        $('.layedit-tool-image').removeAttr('layedit-event');
+        $('.layedit-tool-image input').remove();
+        function sumbit(title,content,url,type,summary){
+            var formData = new FormData();
+            formData.append('content',content);
+            formData.append('title',title);
+            formData.append('url',url);
+            formData.append('type',type);
+            formData.append('summary',summary);
+            $.ajax({
+                url: '/[[${user.username}]]/shareResource',
+                type: 'POST',
+                data: formData,
+                //这两个设置项必填
+                contentType: false,
+                processData: false,
+                dataType: 'jsonp',
+                calback: "callback",
+                cache: false,
+                success: function (data) {
+                    if (data['status'] == '200') {
+                        layer.msg("提交成功", { icon: 1, time: 1000 });
+                        var id=data['data'];
+                        window.location.href="/[[${user.username}]]/article/"+id;
+                    } else {
+                        layer.msg('提交失败!', { icon: 2, time: 1000 });
+                        //console.log(data);
+                    }
+
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    layer.msg('网络错误!',{icon:2,time:1000});
+                }
+            });
+        }
+
+    });
+</script>
+</body>
+</html>

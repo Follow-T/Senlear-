@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5" >
+<head>
+  <meta charset="utf-8">
+  <title>Fly Template v3.0，基于 layui 的极简社区页面模版</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="keywords" content="fly,layui,前端社区">
+  <meta name="description" content="Fly社区是模块化前端UI框架Layui的官网社区，致力于为web开发提供强劲动力">
+  <link rel="stylesheet" href="/res/layui/css/layui.css">
+  <link rel="stylesheet" href="/res/css/global.css">
+  <link rel="stylesheet" href="/res/common.css">
+  <title th:text="${article.title}"></title>
+</head>
+<body>
+<!--用户顶部状态条-->
+<div th:replace="~{/user/index::senlear_userTopBar}">
+</div>
+
+<div class="layui-container">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12 content detail">
+      <div class="fly-panel detail-box">
+        <h1 th:text="${article.title}">Fly Template v3.0，基于 layui 的极简社区页面模版</h1>
+        <div class="fly-detail-info">
+          <span class="layui-badge  fly-detail-column"></span>
+          <span class="fly-list-nums">
+            <i class="iconfont"  title="人气">&#xe60b;</i>[[${article.reading}]]
+          </span>
+        </div>
+        <div class="detail-about">
+          <a class="fly-avatar" >
+             <img th:src="${user.avatar} == null ? 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg' : ${user.avatar}" alt="${user.username}">
+          </a>
+          <div class="fly-detail-user">
+            <a href="../user/home.html" class="fly-link">
+              <cite th:text="${user.name}">贤心</cite>
+              <i class="iconfont icon-renzheng" title="认证信息：{{ rows.user.approve }}"></i>
+              <i class="layui-badge fly-badge-vip">VIP3</i>
+            </a>
+            <span th:text="${article.createTime}">2017-11-30</span>
+          </div>
+
+        </div>
+        <div  th:utext="${article.content}" class="detail-body photos">
+         内容
+        </div>
+
+        <!---文件引入-->
+        <div class="layui-card">
+          
+          <fieldset class="layui-elem-field layui-field-title" style="text-align: center;">
+            <legend><h3 class="layui-btn layui-btn-normal  layui-btn-radius">点击文件查看即可下载</h3></legend>
+          </fieldset>
+          <div class="layui-card-body">
+            <div class="btnDiv">
+              
+            </div>
+
+            <div class="file-list">
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+
+
+    </div>
+  </div>
+   <div class="fly-panel detail-box" id="flyReply" th:replace="/user/detail::senlear_reply">
+        
+      </div>
+</div>
+
+<div th:replace="~{index::senlear_footer}" class="fly-footer">
+</div>
+<!-- 下拉菜单 -->
+<div class="dropdown-menu dropdown-anchor-top-left" id="dropdownFile">
+  <div class="dropdown-anchor"></div>
+  <ul>
+    <li><a id="open"><i class="layui-icon layui-icon-file"></i>&emsp;查看&emsp;</a></li>
+    <li><a id="copy"><i class="layui-icon layui-icon-release"></i>&emsp;复制&emsp;</a></li>
+    <li><a id="share"><i class="layui-icon layui-icon-file"></i>&emsp;分享&emsp;</a></li>
+    
+
+  </ul>
+</div>
+
+
+<!-- 渲染模板 -->
+<script id="fileTpl" type="text/html">
+  {{#  layui.each(d, function(index, item){ }}
+  <div class="file-list-item" data-dir="{{item.isDir}}" data-url="{{item.url}}" data-name="{{item.name}}">
+    <div class="file-list-img {{item.hasurl?'media':''}}">
+      {{# if(item.hasurl){ }}
+      <img src="{{item.url}}"/>
+      {{# }else{ }}
+      <img src="/res/images/fti/{{item.type}}.png"/>
+      {{# } }}
+    </div>
+    <div class="file-list-name">{{item.name}}</div>
+  </div>
+  {{#  }); }}
+  {{# if(d.length<=0){ }}
+  <div class="list-empty">
+    <i class="layui-icon layui-icon-face-surprised"></i>
+    <div>没有文件</div>
+  </div>
+  {{# } }}
+</script>
+<script th:src="@{/res/layui/layui.js}"></script>
+
+<script type="text/javascript" th:src="@{/res/clipboard.min.js}"></script>
+<script src="http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"></script>
+<script>
+var baseServer = "/";
+layui.use(['jquery', 'layer', 'element', 'upload', 'laytpl', 'util'], function () {
+    var $ = layui.jquery;
+    var layer = layui.layer;
+    var element = layui.element;
+    var upload = layui.upload;
+    var laytpl = layui.laytpl;
+    var util = layui.util;
+
+    // 渲染文件列表
+    function renderList(dir) {
+        var username;
+        var articleid;
+        var url = document.location.toString();
+        var arrUrl = url.split("/");
+        username = arrUrl[3];
+        articleid=arrUrl[5];
+      if (!dir) {
+        dir = $('#tvFP').text();
+      }
+      $.get(baseServer +username+'/file/list/'+articleid, {
+        dir: dir
+      }, function (res) {
+
+        if (res.code == 200) {
+          for (var i = 0; i < res.data.length; i++) {
+            res.data[i].url = res.data[i].url;
+
+          }
+          laytpl(fileTpl.innerHTML).render(res.data, function (html) {
+            $('.file-list').html(html);
+          });
+        } else {
+          layer.msg(res.msg, {icon: 2});
+        }
+      });
+    }
+
+    renderList();
+
+    // 上传文件事件
+    upload.render({
+      elem: '#btnUpload',
+      url: baseServer + 'file/upload',
+      data:{filepath:"/senlear"},
+      choose: function (obj) {
+        layer.load(2);
+      },
+      done: function (res, index, upload) {
+        layer.closeAll('loading');
+        if (res.code != 200) {
+          alert($("#tvFP").text());
+          layer.msg(res.msg, {icon: 2});
+        } else {
+          alert($("#tvFP").text());
+          layer.msg(res.msg, {icon: 1});
+          renderList();
+        }
+      },
+      error: function () {
+        layer.closeAll('loading');
+        layer.msg('上传失败', {icon: 2});
+      },
+      accept: 'file'
+    });
+
+    // 刷新
+    $('#btnRefresh').click(function () {
+      renderList();
+    });
+
+    var mUrl;
+    // 列表点击事件
+    $('body').on('click', '.file-list-item', function (e) {
+      var isDir = $(this).data('dir');
+      var name = $(this).data('name');
+      mUrl = $(this).data('url');
+      $('#copy').attr('data-clipboard-text', mUrl);
+      if (isDir) {
+        var cDir = $('#tvFP').text();
+        cDir += (cDir == '/' ? name : ('/' + name));
+        $('#tvFP').text(cDir);
+        renderList(cDir);
+      } else {
+        var $target = $(this).find('.file-list-img');
+        $('#dropdownFile').css({
+          'top': $target.offset().top + 90,
+          'left': $target.offset().left + 25
+        });
+        $('#dropdownFile').addClass('dropdown-opened');
+        if (e !== void 0) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }
+    });
+
+    // 返回上级
+    $('#btnBack').click(function () {
+      var cDir = $('#tvFP').text();
+      if (cDir == '/') {
+        // layer.msg('已经是根目录', {icon: 2})
+      } else {
+        cDir = cDir.substring(0, cDir.lastIndexOf('/'));
+        if (!cDir) {
+          cDir = '/';
+        }
+        $('#tvFP').text(cDir);
+        renderList(cDir);
+      }
+    });
+
+    // 点击空白隐藏下拉框
+    $('html').off('click.dropdown').on('click.dropdown', function () {
+      $('#copy').attr('data-clipboard-text', '');
+      $('#dropdownFile').removeClass('dropdown-opened');
+    });
+
+    // 打开
+    $('#open').click(function () {
+      window.open(mUrl);
+    });
+    // 删除
+    $('#del').click(function () {
+      layer.confirm('确定要删除此文件吗？', function () {
+        layer.load(2);
+        $.get(baseServer + 'file/del', {
+          file: mUrl.substring(mUrl.indexOf('/file/') + 6)
+        }, function (res) {
+          layer.closeAll('loading');
+          if (res.code == 200) {
+            layer.msg(res.msg, {icon: 1});
+            renderList();
+          } else {
+            layer.msg(res.msg, {icon: 2});
+          }
+        });
+      });
+    });
+    // 复制
+    var clipboard = new ClipboardJS('#copy');
+    clipboard.on('success', function (e) {
+      e.clearSelection();
+      layer.msg('文件地址已复制', {icon: 1});
+    });
+    clipboard.on('error', function (e) {
+      layer.msg('复制失败，请手动复制', {icon: 2});
+    });
+
+    $('#btnDilaog').click(function (){
+      window.open("/file/index");
+    });
+  });
+layui.cache.page = 'jie';
+layui.cache.user = {
+  username: '游客'
+  ,uid: -1
+  ,avatar: '../../res/images/avatar/00.jpg'
+  ,experience: 83
+  ,sex: '男'
+};
+layui.config({
+  version: "3.0.0"
+  ,base: '/res/mods/'
+}).extend({
+  fly: 'index'
+}).use(['fly', 'face'], function(){
+  var $ = layui.$
+  ,fly = layui.fly;
+
+  //如果你是采用模版自带的编辑器，你需要开启以下语句来解析。
+  /*
+  $('.detail-body').each(function(){
+    var othis = $(this), html = othis.html();
+    othis.html(fly.content(html));
+  });
+  */
+});
+
+
+</script>
+
+</body>
+</html>

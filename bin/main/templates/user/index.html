@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<!--引入头部-->
+<head th:replace="~{index::senlear_head}">
+</head>
+<body>
+
+<div th:fragment="senlear_userTopBar" class="fly-header layui-bg-black">
+  <div class="layui-container" >
+    <a class="fly-logo" href="/">
+      <img src="/res/logo.png" alt="layui">
+    </a>
+    <ul class="layui-nav fly-nav layui-hide-xs">
+      <li class="layui-nav-item layui-this">
+        <a href="/"><i class="iconfont icon-jiaoliu"></i>悠悠我心.</a>
+      </li>
+      <li class="layui-nav-item">
+        <a href="../case/case.html"><i class="iconfont icon-iconmingxinganli"></i>TiAmo.</a>
+      </li>
+      <li class="layui-nav-item">
+        <a href="http://www.layui.com/" target="_blank"><i class="iconfont icon-ui"></i>你的头发乱了喔.</a>
+      </li>
+    </ul>
+    
+    <ul class="layui-nav fly-nav-user">
+          
+      <!-- 未登入的状态 -->
+      <div sec:authorize="isAnonymous()" >
+	      <li  class="layui-nav-item">
+	        <a class="iconfont icon-touxiang layui-hide-xs" href="user/login.html"></a>
+	      </li>
+	      <li class="layui-nav-item">
+	        <a href="/login">登入</a>
+	      </li>
+	      <li class="layui-nav-item">
+	        <a href="/reg">注册</a>
+	      </li>
+	      <li class="layui-nav-item layui-hide-xs">
+	        <a href="https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=101568799&redirect_uri=http://www.senlear.com/QQLogin&state=test" onclick="layer.msg('正在通过QQ登入', {icon:16, shade: 0.1, time:0})" title="QQ登入" class="iconfont icon-qq"></a>
+	      </li>
+	      <li class="layui-nav-item layui-hide-xs">
+	        <a href="/app/weibo/" onclick="layer.msg('正在通过微博登入', {icon:16, shade: 0.1, time:0})" title="微博登入" class="iconfont icon-weibo"></a>
+	      </li>
+      </div>
+      <!-- 登录 -->
+      <li sec:authorize="isAuthenticated()" th:attr="username=${#authentication.principal.username}" class="layui-nav-item">
+        <a class="fly-nav-avatar" href="javascript:;">
+          <cite class="layui-hide-xs" th:text="${#authentication.principal.name}">贤心</cite>
+          <i class="iconfont icon-renzheng layui-hide-xs" title="认证信息：layui 作者"></i>
+          <i class="layui-badge fly-badge-vip layui-hide-xs">VIP3</i>
+          <img th:src="${#authentication.principal.avatar} == null ? 'https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg' : ${#authentication.principal.avatar}" alt="Tg">
+        </a>
+        <dl class="layui-nav-child" id="userid" th:attr="userid=${#authentication.principal.id}">
+          <dd><a href="/set.html" th:href="'/'+${#authentication.principal.username}+'/set'"><i class="layui-icon">&#xe620;</i>基本设置</a></dd>
+          <dd><a href="user/message.html" th:href="'/'+${#authentication.principal.username}+'/message'"><i class="iconfont icon-tongzhi" style="top: 4px;"></i>我的消息</a></dd>
+          <dd><a href="user/home.html" th:href="'/'+${#authentication.principal.username}+'/home'"><i class="layui-icon" style="margin-left: 2px; font-size: 22px;">&#xe68e;</i>我的主页</a></dd>
+          <hr style="margin: 5px 0;">
+          <dd><a href="/logout" style="text-align: center;">退出</a></dd>
+        </dl>
+      </li>
+     
+    </ul>
+  </div>
+</div>
+
+<div class="layui-container fly-marginTop fly-user-main">
+  <ul th:fragment="senlear_userSidebar" class="layui-nav layui-nav-tree layui-inline" lay-filter="user">
+    <li class="layui-nav-item">
+      <a th:href="'/'+${#authentication.principal.username}+'/home'" >
+        <i class="layui-icon">&#xe609;</i>
+        我的主页
+      </a>
+    </li>
+    <li class="layui-nav-item">
+      <a th:href="'/'+${#authentication.principal.username}+'/index'" href="/user/index">
+        <i class="layui-icon">&#xe612;</i>
+        用户中心
+      </a>
+    </li>
+    <li class="layui-nav-item ">
+      <a th:href="'/'+${#authentication.principal.username}+'/set'" href="/user/set">
+        <i class="layui-icon">&#xe620;</i>
+        基本设置
+      </a>
+    </li>
+    <li class="layui-nav-item">
+      <a th:href="'/'+${#authentication.principal.username}+'/message'" href="/user/message">
+        <i class="layui-icon">&#xe611;</i>
+        我的消息
+      </a>
+    </li>
+    <li class="layui-nav-item">
+      <a th:href="'/'+${#authentication.principal.username}+'/articlemanage'" href="/user/articlemanage">
+        <i class="layui-icon">&#xe705;</i>
+        文章管理
+      </a>
+    </li>
+    <li class="layui-nav-item">
+      <a th:href="'/'+${#authentication.principal.username}+'/article/publish'" href="/user/articlepublish">
+        <i class="layui-icon">&#xe608;</i>
+        文章发布
+      </a>
+    </li>
+    <li class="layui-nav-item">
+      <a th:href="'/'+${#authentication.principal.username}+'/file/manager'" href="/user/articlepublish">
+        <i class="layui-icon">&#xe632;</i>
+        文件服务
+      </a>
+    </li>
+  </ul>
+
+  <div class="site-tree-mobile layui-hide">
+    <i class="layui-icon">&#xe602;</i>
+  </div>
+  <div class="site-mobile-shade"></div>
+  
+  <div class="site-tree-mobile layui-hide">
+    <i class="layui-icon">&#xe602;</i>
+  </div>
+  <div class="site-mobile-shade"></div>
+  
+  
+  <div class="fly-panel fly-panel-user" pad20>
+    <!--
+    <div class="fly-msg" style="margin-top: 15px;">
+      您的邮箱尚未验证，这比较影响您的帐号安全，<a href="activate.html">立即去激活？</a>
+    </div>
+    -->
+    <div class="layui-tab layui-tab-brief" lay-filter="user">
+      <ul class="layui-tab-title" id="LAY_mine">
+        <li data-type="mine-jie" lay-id="index" class="layui-this">我的发帖（<span th:text="${articlesList.size()}"></span>）</li>
+        <li data-type="collection" data-url="/collection/find/" lay-id="collection">我的收藏（<span th:text="${collectArticleList.size()}">0</span>）</li>
+        <li data-type="care" data-url="/collection/find/" lay-id="care">我的关注（<span th:text="${followuserSize}">0</span>）</li>
+        <li data-type="fans" data-url="/collection/find/" lay-id="fans">我的粉丝（<span th:text="${followMeSize}">0</span>）</li>
+      </ul>
+      <div class="layui-tab-content" style="padding: 20px 0;">
+        <div class="layui-tab-item layui-show">
+          <ul class="mine-view jie-row" >
+            <li th:each="article : ${articlesList}">
+              <a class="jie-title" th:href="'/'+${article.getUser().username} + '/article/'+ ${article.id}"  th:title="${article.title}" th:text="${article.title}" target="_blank">基于 layui 的极简社区页面模版</a>
+              <i th:text="${article.createTime}"></i>
+              
+              <em>[[${article.reading}]]阅/[[${article.commentsize}]]答</em>
+            </li>
+          </ul>
+          <div id="LAY_page"></div>
+        </div>
+        <div class="layui-tab-item">
+          <ul class="mine-view jie-row" >
+            <li th:each="article : ${collectArticleList}">
+              <a th:href="'/'+${article.getUser().username} + '/article/'+ ${article.id}"  th:title="${article.title}" th:text="${article.title}"></a>
+              <i>收藏于[[${article.getUser().name}]]</i>
+              <em>[[${article.reading}]]阅/[[${article.commentsize}]]答</em>
+            </li>
+          </ul>
+          <div id="LAY_page1"></div>
+        </div>
+        <div class="layui-tab-item">
+          <ul class="mine-view jie-row">
+            <li th:each="article : ${followArticleList}">
+              <a th:href="'/'+${article.getUser().username} + '/article/'+ ${article.id}"  th:title="${article.title}" th:text="${article.title}"></a>
+              <i>来自于[[${article.getUser().name}]]</i>
+              <em>[[${article.reading}]]阅/[[${article.commentsize}]]答</em>
+            </li>
+          </ul>
+          <div id="LAY_page1"></div>
+        </div>
+        <div class="layui-tab-item">
+          <ul class="mine-view jie-row">
+            <li th:each="article :${followMeArticleList}">
+              <a th:href="'/'+${article.getUser().username} + '/article/'+ ${article.id}"  th:title="${article.title}" th:text="${article.title}"></a>
+              <i>来自于[[${article.getUser().name}]]</i>
+              <em>[[${article.reading}]]阅/[[${article.commentsize}]]答</em>
+            </li>
+          </ul>
+          <div id="LAY_page1"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--引入角页-->
+<div th:replace="~{index::senlear_footer}" class="fly-footer">
+</div>
+
+<script src="/res/layui/layui.js"></script>
+<script>
+layui.cache.page = 'user';
+layui.cache.user = {
+  username: '游客'
+  ,uid: -1
+  ,avatar: '../../res/images/avatar/00.jpg'
+  ,experience: 83
+  ,sex: '男'
+};
+layui.config({
+  version: "3.0.0"
+  ,base: '../../res/mods/'
+}).extend({
+  fly: 'index'
+}).use('fly');
+</script>
+
+</body>
+</html>
